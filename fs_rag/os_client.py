@@ -80,6 +80,30 @@ class OpenSearchClient:
             )
             return None
 
+    def knn_search(self, index, embedding, top_k):
+        query = {
+            "size": top_k,
+            "query": {
+                "knn": {  # 使用 k-nearest neighbors 查詢
+                    "embedding": {"vector": embedding, "k": top_k}
+                }
+            },
+        }
+
+        sentences = []
+        try:
+            res = self.client.search(index=index, body=query)
+            for hit in res["hits"]["hits"]:
+                sentences.append(
+                    {
+                        "score": hit["_score"],
+                        "text": hit["_source"]["text"],
+                    }
+                )
+            return sentences
+        except Exception as e:
+            logger.error(f"Error searching in index {index}: {e}")
+
 
 if __name__ == "__main__":
     import random
