@@ -1,0 +1,45 @@
+services:
+  opensearch:
+    image: opensearchproject/opensearch:3.1.0
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=OpenSearchP!ssa0rd"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:3.1.0
+    ports:
+      - "5601:5601"
+    environment:
+      OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
+      OPENSEARCH_USERNAME: "admin"
+      OPENSEARCH_PASSWORD: "OpenSearchP!ssa0rd"
+    depends_on:
+      - opensearch
+
+  fs-rag:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    environment:
+      OS_PSWD: OpenSearchP!ssa0rd
+      OPENAI_URL: <URL>
+      OPENAI_KEY: <KEY>
+      OPENAI_MODEL: <MODEL>
+      EMBEDDING_DIM: <DIM>
+    depends_on:
+      - opensearch
+
+volumes:
+  opensearch-data:
