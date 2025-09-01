@@ -1,6 +1,7 @@
 import os
 
 from os_client import OpenSearchClient
+from vecdb import VectorDB
 
 DATA_DIR = os.getenv("DATA_DIR", "./data")
 INDEX = "file_metadata"
@@ -17,6 +18,7 @@ INDEX_CONFIG = {
 class FileSystem:
     def __init__(self):
         self.client = OpenSearchClient()
+        self.vecdb = VectorDB()
         self.last_modified = {}
 
         if INDEX not in self.client.list_index():
@@ -52,7 +54,10 @@ class FileSystem:
                     self.last_modified[rel_path] = last_modify_ms
                     modified_files.append(rel_path)
 
-                    # TODO: insert/update the vector DB
+                    # TODO: remove previous embeddings if self.last_modified[rel_path] != last_modify_ms
+
+                    # Insert file content to vector store
+                    self.vecdb.insert(f"{DATA_DIR}/{rel_path}")
         return modified_files
 
 
@@ -68,4 +73,4 @@ if __name__ == "__main__":
         f.writelines("=" * random.randint(1, 40))
 
     fs.check_modified()
-    print(fs.last_modified)
+    print(fs.last_odified)

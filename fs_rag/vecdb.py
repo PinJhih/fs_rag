@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from os_client import OpenSearchClient
 
 load_dotenv(".env")
+DATA_DIR = os.getenv("DATA_DIR", "./data")
 INDEX = os.getenv("KNN_INDEX", "knn")
 OPENAI_URL = os.getenv("OPENAI_URL")
 OPENAI_KEY = os.getenv("OPENAI_KEY")
@@ -80,14 +81,6 @@ class VectorDB:
             doc = {"file_path": file_path, "text": chunk, "embedding": embedding}
             self.client.insert_doc(INDEX, doc)
 
-    def search(self, text, top_k=3):
+    def search(self, text, top_k=3) -> list[dict]:
         embedding = self.embedding(text)
         return self.client.knn_search(INDEX, embedding, top_k)
-
-
-if __name__ == "__main__":
-    db = VectorDB()
-    text = "控制器"
-    res = db.search(text)
-
-    print(res)
