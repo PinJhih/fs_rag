@@ -47,12 +47,10 @@ class OpenSearchClient:
         except Exception as e:
             print(f"Failed to create index '{index}': {e}")
 
-    def list_docs(self, index, size=10):
+    def list_docs(self, index):
         """List documents in index"""
         try:
-            res = self.client.search(
-                index=index, body={"query": {"match_all": {}}}, size=size
-            )
+            res = self.client.search(index=index, body={"query": {"match_all": {}}})
             return res["hits"]["hits"]
         except Exception as e:
             logger.error(f"Failed to list documents from index '{index}': {e}")
@@ -131,4 +129,7 @@ if __name__ == "__main__":
     title = f"title-{random.randint(0, 1<<30)}"
     doc = {"title": title, "context": "demo"}
     client.insert_doc(index, doc)
-    print(f"Document {title} is inserted")
+    print(f"Document {title} is inserted!\n")
+
+    docs = client.list_docs(index)
+    print(docs)
