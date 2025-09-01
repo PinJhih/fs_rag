@@ -1,1 +1,4 @@
 fastmcp==2.11.3
+opensearch-py==3.0.0
+dotenv
+python-json-logger
