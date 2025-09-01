@@ -6,6 +6,7 @@ __pycache__/
 .venv/
 env/
 venv/
+.env
 
 build/
 dist/
@@ -16,3 +17,4 @@ dist/
 *.swp
 
 .DS_Store
+data/
