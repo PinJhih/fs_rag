@@ -5,15 +5,24 @@ from fastmcp import FastMCP
 
 from fs import FileSystem
 from vecdb import VectorDB
+from logger import get_json_logger
 
 mcp = FastMCP("FS-RAG")
 fs = FileSystem()
 vecdb = VectorDB()
-
+logger = get_json_logger("server")
 
 def worker():
     while True:
-        fs.check_modified()
+        modified_files, new_files = fs.check_modified()
+        for file in modified_files:
+            vecdb.delete(file)
+            vecdb.insert(file)
+            logger.info(f"Update file: {file}")
+
+        for file in new_files:
+            vecdb.insert(file)
+            logger.info(f"Insert file: {file}")
         time.sleep(15)
 
 

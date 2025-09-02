@@ -67,10 +67,10 @@ class VectorDB:
         return self.embedding_model.embedding(text)
 
     def insert(self, file_path: str, chunk_size: int = 768):
-        if not os.path.exists(file_path):
+        if not os.path.exists(f"{DATA_DIR}/{file_path}"):
             raise FileNotFoundError(f"File not found: {file_path}")
 
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(f"{DATA_DIR}/{file_path}", "r", encoding="utf-8") as file:
             content = file.read()
 
         chunks = [
@@ -84,3 +84,9 @@ class VectorDB:
     def search(self, text, top_k=3) -> list[dict]:
         embedding = self.embedding(text)
         return self.client.knn_search(INDEX, embedding, top_k)
+
+    def delete(self, file_path):
+        docs = self.client.search_docs(INDEX, f"{DATA_DIR}/{file_path}", "file_path")
+        for doc in docs:
+            doc_id = doc["_id"]
+            self.client.delete_doc(INDEX, doc_id)
