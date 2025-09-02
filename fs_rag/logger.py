@@ -1,6 +1,6 @@
 import logging
 
-from pythonjsonlogger import jsonlogger
+import pythonjsonlogger.json as jsonlogger
 
 def get_json_logger(name: str, log_level=logging.INFO) -> logging.Logger:
     logger = logging.getLogger(name)

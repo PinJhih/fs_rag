@@ -15,6 +15,12 @@ services:
     ports:
       - "9200:9200"
       - "9600:9600"
+    healthcheck:
+      test: ["CMD", "curl", "-u", "admin:OpenSearchP!ssa0rd", "-k", "https://localhost:9200"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 45s
 
   opensearch-dashboards:
     image: opensearchproject/opensearch-dashboards:3.1.0
@@ -25,7 +31,8 @@ services:
       OPENSEARCH_USERNAME: "admin"
       OPENSEARCH_PASSWORD: "OpenSearchP!ssa0rd"
     depends_on:
-      - opensearch
+      opensearch:
+        condition: service_healthy
 
   fs-rag:
     build:
@@ -39,7 +46,8 @@ services:
       OPENAI_MODEL: <MODEL>
       EMBEDDING_DIM: <DIM>
     depends_on:
-      - opensearch
+      opensearch:
+        condition: service_healthy
 
 volumes:
   opensearch-data:

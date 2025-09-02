@@ -12,7 +12,8 @@ fs = FileSystem()
 vecdb = VectorDB()
 logger = get_json_logger("server")
 
-def worker():
+
+def fs_worker():
     while True:
         modified_files, new_files = fs.check_modified()
         for file in modified_files:
@@ -26,10 +27,6 @@ def worker():
         time.sleep(15)
 
 
-t = threading.Thread(target=worker, daemon=True)
-t.start()
-
-
 @mcp.tool
 def search(text: str) -> str:
     """
@@ -40,4 +37,6 @@ def search(text: str) -> str:
 
 
 if __name__ == "__main__":
+    fs_thread = threading.Thread(target=fs_worker, daemon=True)
+    fs_thread.start()
     mcp.run(transport="http", host="0.0.0.0", port=8000)
